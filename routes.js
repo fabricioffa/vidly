@@ -4,6 +4,8 @@ const genre = require('./controllers/genre')
 const home = require('./controllers/home');
 const movie = require('./controllers/movie')
 const rental = require('./controllers/rental');
+const user = require('./controllers/user');
+const auth = require('./controllers/auth');
 
 router.get("/", home.index);
 
@@ -31,5 +33,10 @@ router.get("/api/rentals/:id", rental.showOne);
 router.post("/api/rentals", rental.register);
 router.put("/api/rentals/:id", rental.edit);
 router.delete("/api/rentals/:id", rental.delete);
+
+router.get("/api/users", user.index);
+router.post("/api/users", user.register);
+
+router.post("/api/auth", auth.login);
 
 module.exports = router;

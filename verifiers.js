@@ -59,7 +59,7 @@ exports.moviePostVerifier = (body) => {
   });
 
   return schema.validate(body, { abortEarly: false });
-}
+};
 
 exports.moviePutVerifier = (body) => {
   const schema = Joi.object({
@@ -70,7 +70,7 @@ exports.moviePutVerifier = (body) => {
   });
 
   return schema.validate(body, { abortEarly: false });
-}
+};
 
 exports.rentalPostVerifier = (body) => {
   const schema = Joi.object({
@@ -80,7 +80,7 @@ exports.rentalPostVerifier = (body) => {
   });
 
   return schema.validate(body, { abortEarly: false });
-}
+};
 
 exports.rentalPutVerifier = (body) => {
   const schema = Joi.object({
@@ -90,4 +90,34 @@ exports.rentalPutVerifier = (body) => {
   });
 
   return schema.validate(body, { abortEarly: false });
-}
+};
+
+exports.userPostVerifier = (body) => {
+  const schema = Joi.object({
+    name: Joi.string().min(3).max(40).lowercase().trim().required(),
+    email: Joi.string().min(8).max(50).email().required(),
+    password: Joi.string().min(8).max(255).required(),
+  });
+
+  return schema.validate(body, { abortEarly: false });
+};
+
+exports.userPutVerifier = (body) => {
+  const schema = Joi.object({
+    name: Joi.string().min(3).max(40).lowercase().trim(),
+    email: Joi.string().min(8).max(255).email(),
+    password: Joi.string().min(8).max(255),
+  });
+
+  return schema.validate(body, { abortEarly: false });
+};
+
+exports.userLoginVerifier = (body) => {
+  const schema = Joi.object({
+    email: Joi.string().min(8).max(50).email().required(),
+    password: Joi.string().min(8).max(255).required(),
+  });
+
+  return schema.validate(body, { abortEarly: false });
+};
+
