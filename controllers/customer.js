@@ -1,8 +1,7 @@
-const router = require("express").Router();
 const Customer = require("../models/Customer");
 const { customerPostVerifier: postVerifier , customerPutVerifier: putVerifier } = require("../verifiers");
 
-router.get("/", async (req, res) => {
+exports.index = async (req, res) => {
   try {
     const customers = await Customer.find().select('-__v');
 
@@ -12,9 +11,9 @@ router.get("/", async (req, res) => {
   } catch (err) {
     console.log(err);
   }
-});
+};
 
-router.post("/", async (req, res) => {
+exports.register = async (req, res) => {
   const { error } = postVerifier(req.body);
 
   if (error) {
@@ -34,11 +33,12 @@ router.post("/", async (req, res) => {
 
     res.send(customer);
   } catch (err) {console.log(err)}
-});
+};
 
-router.put("/:id", async (req, res) => {
+exports.edit = async (req, res) => {
   try {
-    if (!await Customer.exists({ _id: req.params.id })) return res.status(404).send("Genre not found");
+    const customer = await Customer.findById(req.params.id);
+    if (!customer) return res.status(404).send("Customer not found");
 
     const { error } = putVerifier(req.body);
     if (error) {
@@ -49,7 +49,7 @@ router.put("/:id", async (req, res) => {
       return res.status(400).send(errors);
     }
 
-    const customer = await Customer.findOneAndUpdate(
+    const customerUpdated = await Customer.findOneAndUpdate(
       { _id: req.params.id },
       {
         name: req.body.name ? req.body.name : customer.name,
@@ -59,11 +59,11 @@ router.put("/:id", async (req, res) => {
       { returnDocument: 'after' },
     ).select('-__v');
 
-    res.send(customer);
+    res.send(customerUpdated);
   } catch (err) {console.log(err)}
-});
+};
 
-router.delete("/:id", async (req, res) => {
+exports.delete = async (req, res) => {
   try {
     const customer = await Customer.findByIdAndRemove(req.params.id).select('-__v');
 
@@ -71,9 +71,9 @@ router.delete("/:id", async (req, res) => {
 
     res.send(customer);
   } catch (err) {console.log(err)}
-});
+};
 
-router.get("/:id", async (req, res) => {
+exports.showOne = async (req, res) => {
   try {
     const customer = await Customer.findById(req.params.id).select('-__v');
 
@@ -81,8 +81,4 @@ router.get("/:id", async (req, res) => {
 
     res.send(customer);
   } catch (err) {console.log(err)}
-});
-
-
-
-module.exports = router;
+}

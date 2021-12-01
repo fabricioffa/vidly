@@ -1,11 +1,10 @@
-const router = require("express").Router();
 const { Genre } = require("../models/Genre");
 const {
   genrePostVerifier: postVerifier,
   genrePutVerifier: putVerifier,
 } = require("../verifiers");
 
-router.get("/", async (req, res) => {
+exports.index = async (req, res) => {
   try {
     const genres = await Genre.find().select("-__v");
 
@@ -15,9 +14,9 @@ router.get("/", async (req, res) => {
   } catch (err) {
     console.log(err);
   }
-});
+};
 
-router.post("/", async (req, res) => {
+exports.register = async (req, res) => {
   const { error } = postVerifier(req.body);
 
   if (error) {
@@ -39,12 +38,12 @@ router.post("/", async (req, res) => {
   } catch (err) {
     console.log(err);
   }
-});
+};
 
-router.put("/:id", async (req, res) => {
+exports.edit = async (req, res) => {
   try {
-    if (!(await Genre.exists({ _id: req.params.id })))
-      return res.status(404).send("Genre not found");
+    const genre = await Genre.findById(req.params.id);
+    if (!genre) return res.status(404).send("Genre not found");
 
     const { error } = putVerifier(req.body);
     if (error) {
@@ -55,7 +54,7 @@ router.put("/:id", async (req, res) => {
       return res.status(400).send(errors);
     }
 
-    const genre = await Genre.findOneAndUpdate(
+    const genreUpdated = await Genre.findOneAndUpdate(
       { _id: req.params.id },
       {
         name: req.body.name ? req.body.name : genre.name,
@@ -66,13 +65,13 @@ router.put("/:id", async (req, res) => {
       { returnDocument: "after" }
     ).select("-__v");
 
-    res.send(genre);
+    res.send(genreUpdated);
   } catch (err) {
     console.log(err);
   }
-});
+};
 
-router.delete("/:id", async (req, res) => {
+exports.delete = async (req, res) => {
   try {
     const genre = await Genre.findByIdAndRemove(req.params.id).select("-__v");
 
@@ -82,9 +81,9 @@ router.delete("/:id", async (req, res) => {
   } catch (err) {
     console.log(err);
   }
-});
+};
 
-router.get("/:id", async (req, res) => {
+exports.showOne = async (req, res) => {
   try {
     const genre = await Genre.findById(req.params.id).select("-__v");
 
@@ -94,6 +93,4 @@ router.get("/:id", async (req, res) => {
   } catch (err) {
     console.log(err);
   }
-});
-
-module.exports = router;
+};

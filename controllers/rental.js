@@ -1,4 +1,3 @@
-const router = require("express").Router();
 const Rental = require("../models/Rental");
 const Customer = require('../models/Customer');
 const Movie = require('../models/Movie');
@@ -7,9 +6,9 @@ const {
   rentalPutVerifier: putVerifier,
 } = require("../verifiers");
 
-router.get("/", async (req, res) => {
+exports.index = async (req, res) => {
   try {
-    const rentals = await Rental.find().select("-__v");
+    const rentals = await Rental.find().populate('customer movie', 'name title -_id').select("-__v");
 
     if (!rentals.length) return res.send("We're currently out of rentals");
 
@@ -17,9 +16,9 @@ router.get("/", async (req, res) => {
   } catch (err) {
     console.log(err);
   }
-});
+};
 
-router.post("/", async (req, res) => {
+exports.register = async (req, res) => {
   const { error } = postVerifier(req.body);
 
   if (error) {
@@ -32,7 +31,8 @@ router.post("/", async (req, res) => {
   try {
     if (!await Customer.exists({ _id: req.body.customerId })) return res.status(400).send("Id doesn't match any customer.");
 
-    if (!await Movie.exists({ _id: req.body.movieId })) return res.status(400).send("Id doesn't match any movie.");
+    const movie = await Movie.findById(req.body.movieId);
+    if (!movie) return res.status(400).send("Id doesn't match any movie.");
 
     const rental = await Rental.create({
       customer: req.body.customerId,
@@ -40,16 +40,19 @@ router.post("/", async (req, res) => {
       paymentForm: req.body.paymentForm,
     });
 
+    movie.numberInStock--;
+    movie.save();
+
     res.send(rental);
   } catch (err) {
     console.log(err);
   }
-});
+};
 
-router.put("/:id", async (req, res) => {
+exports.edit = async (req, res) => {
   try {
     const rental = await Rental.findById(req.params.id);
-    if (!movie) return res.status(404).send("Movie not found.");
+    if (!rental) return res.status(404).send("Rental not found.");
 
     const { error } = putVerifier(req.body);
     if (error) {
@@ -71,20 +74,20 @@ router.put("/:id", async (req, res) => {
         movie: req.body.movieId ? req.body.movieId : rental.movie,
         paymentForm: req.body.paymentForm
           ? req.body.paymentForm
-          : rental.movie,
+          : rental.paymentForm,
       },
       { returnDocument: "after" },
-    ).select("-__v");
+    ).populate('customer movie', 'name title -_id').select("-__v");
 
     res.send(updatedRental);
   } catch (err) {
-    console.log( err);
+    console.log(err);
   }
-});
+};
 
-router.delete("/:id", async (req, res) => {
+exports.delete = async (req, res) => {
   try {
-    const rental = await Rental.findByIdAndRemove(req.params.id).select("-__v");
+    const rental = await Rental.findByIdAndRemove(req.params.id).populate('customer movie', 'name title -_id').select("-__v");
 
     if (!rental) return res.status(404).send("Rental not found");
 
@@ -92,11 +95,11 @@ router.delete("/:id", async (req, res) => {
   } catch (err) {
     console.log(err);
   }
-});
+};
 
-router.get("/:id", async (req, res) => {
+exports.showOne = async (req, res) => {
   try {
-    const rental = await Rental.findById(req.params.id).select("-__v");
+    const rental = await Rental.findById(req.params.id).populate('customer movie', 'name title -_id').select("-__v");
 
     if (!rental) return res.status(404).send("Rental not found");
 
@@ -104,6 +107,4 @@ router.get("/:id", async (req, res) => {
   } catch (err) {
     console.log(err);
   }
-});
-
-module.exports = router;
+};

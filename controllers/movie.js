@@ -1,4 +1,3 @@
-const router = require("express").Router();
 const Movie = require("../models/Movie");
 const { Genre } = require("../models/Genre");
 const {
@@ -6,7 +5,7 @@ const {
   moviePutVerifier: putVerifier,
 } = require("../verifiers");
 
-router.get("/", async (req, res) => {
+exports.index = async (req, res) => {
   try {
     const movies = await Movie.find().select("-__v");
 
@@ -16,9 +15,9 @@ router.get("/", async (req, res) => {
   } catch (err) {
     console.log(err);
   }
-});
+};
 
-router.post("/", async (req, res) => {
+exports.register = async (req, res) => {
   const { error } = postVerifier(req.body);
 
   if (error) {
@@ -49,9 +48,9 @@ router.post("/", async (req, res) => {
   } catch (err) {
     console.log(err);
   }
-});
+};
 
-router.put("/:id", async (req, res) => {
+exports.edit = async (req, res) => {
   try {
     const movie = await Movie.findById(req.params.id);
     if (!movie) return res.status(404).send("Movie not found.");
@@ -96,9 +95,9 @@ router.put("/:id", async (req, res) => {
   } catch (err) {
     console.log( err);
   }
-});
+};
 
-router.delete("/:id", async (req, res) => {
+exports.delete = async (req, res) => {
   try {
     const movie = await Movie.findByIdAndRemove(req.params.id).select("-__v");
 
@@ -108,9 +107,9 @@ router.delete("/:id", async (req, res) => {
   } catch (err) {
     console.log(err);
   }
-});
+};
 
-router.get("/:id", async (req, res) => {
+exports.showOne = async (req, res) => {
   try {
     const movie = await Movie.findById(req.params.id).select("-__v");
 
@@ -120,6 +119,4 @@ router.get("/:id", async (req, res) => {
   } catch (err) {
     console.log(err);
   }
-});
-
-module.exports = router;
+};

@@ -1,4 +1,5 @@
 const Joi = require("joi");
+Joi.objectId = require('joi-objectid')(Joi); // or /^[0-9a-fA-F]{24}$/
 
 exports.genrePostVerifier = (body) => {
   const schema = Joi.object({
@@ -51,8 +52,8 @@ exports.customerPutVerifier = (body) => {
 
 exports.moviePostVerifier = (body) => {
   const schema = Joi.object({
-    title: Joi.string().min(3).max(20).lowercase().trim().required(),
-    genreId: Joi.string().alphanum().trim().required(),
+    title: Joi.string().min(3).max(50).lowercase().trim().required(),
+    genreId: Joi.objectId().required(),
     numberInStock: Joi.number().integer().min(0).max(500).positive().required(),
     dailyRentalRate: Joi.number().integer().min(0).max(500).positive().required(),
   });
@@ -62,8 +63,8 @@ exports.moviePostVerifier = (body) => {
 
 exports.moviePutVerifier = (body) => {
   const schema = Joi.object({
-    title: Joi.string().min(3).max(20).lowercase().trim(),
-    genreId: Joi.string().alphanum().trim(),
+    title: Joi.string().min(3).max(50).lowercase().trim(),
+    genreId: Joi.objectId(),
     numberInStock: Joi.number().integer().min(0).max(500).positive(),
     dailyRentalRate: Joi.number().integer().min(0).max(500).positive(),
   });
@@ -73,19 +74,19 @@ exports.moviePutVerifier = (body) => {
 
 exports.rentalPostVerifier = (body) => {
   const schema = Joi.object({
-    costumerId: Joi.string().alphanum().trim().required(),
-    movieId: Joi.string().alphanum().trim().required(),
+    customerId: Joi.objectId().required(),
+    movieId: Joi.objectId().required(),
     paymentForm: Joi.string().min(5).max(255).required(),
   });
 
   return schema.validate(body, { abortEarly: false });
 }
 
-exports.rentalPostVerifier = (body) => {
+exports.rentalPutVerifier = (body) => {
   const schema = Joi.object({
-    customerId: Joi.string().alphanum().trim().required(),
-    movieId: Joi.string().alphanum().trim().required(),
-    paymentForm: Joi.string().min(5).max(255).valid('creditcard', 'money', 'crypto').required(),
+    customerId: Joi.objectId(),
+    movieId: Joi.objectId(),
+    paymentForm: Joi.string().min(5).max(255).valid('creditcard', 'money', 'crypto'),
   });
 
   return schema.validate(body, { abortEarly: false });
