@@ -1,4 +1,5 @@
 {
   "name" : "Vidly",
-  "default port": 3333
+  "default port": 3333,
+  "jwtPrivateKey": ""
 }

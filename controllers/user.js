@@ -1,4 +1,3 @@
-// const _ = require('lodash');
 const bcryptjs = require('bcryptjs');
 const User = require("../models/User");
 const {
@@ -32,14 +31,18 @@ exports.register = async (req, res) => {
   if (await User.exists({ email: req.body.email })) return res.status(404).send('User already exists.');
 
   try {
-    let {name, email, password} = req.body;
+    let { name, email, password } = req.body;
 
     const salt = await bcryptjs.genSalt(10);
     password = await bcryptjs.hash(password, salt);
 
-    await User.create({name, email, password});
+    const user = await User.create({ name, email, password });
+    const { _id } = user;
 
-    res.send({name, email});
+    const token = user.generateAuthToken();
+    if (!token) return res.status(500).send('Could not generate token.');
+
+    res.header('x-auth-token', token).send({ _id, name, email });
   } catch (err) {
     console.log(err);
   }
