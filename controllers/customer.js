@@ -2,15 +2,11 @@ const Customer = require("../models/Customer");
 const { customerPostVerifier: postVerifier , customerPutVerifier: putVerifier } = require("../verifiers");
 
 exports.index = async (req, res) => {
-  try {
     const customers = await Customer.find().select('-__v');
 
     if (!customers.length) return res.send("No customers enrroled yet. ");
 
     res.send(customers);
-  } catch (err) {
-    console.log(err);
-  }
 };
 
 exports.register = async (req, res) => {
@@ -24,7 +20,7 @@ exports.register = async (req, res) => {
     return res.status(400).send(errors);
   }
 
-  try {
+
     const customer = await Customer.create({
       name: req.body.name,
       phone: req.body.phone,
@@ -32,11 +28,9 @@ exports.register = async (req, res) => {
     });
 
     res.send(customer);
-  } catch (err) {console.log(err)}
 };
 
 exports.edit = async (req, res) => {
-  try {
     const customer = await Customer.findById(req.params.id);
     if (!customer) return res.status(404).send("Customer not found");
 
@@ -60,25 +54,20 @@ exports.edit = async (req, res) => {
     ).select('-__v');
 
     res.send(customerUpdated);
-  } catch (err) {console.log(err)}
 };
 
 exports.delete = async (req, res) => {
-  try {
     const customer = await Customer.findByIdAndRemove(req.params.id).select('-__v');
 
     if (!customer) return res.status(404).send("Customer not found");
 
     res.send(customer);
-  } catch (err) {console.log(err)}
 };
 
 exports.showOne = async (req, res) => {
-  try {
     const customer = await Customer.findById(req.params.id).select('-__v');
 
     if (!customer) return res.status(404).send("Customer not found");
 
     res.send(customer);
-  } catch (err) {console.log(err)}
 }

@@ -1,43 +1,42 @@
 const router = require("express").Router();
 const customer = require('./controllers/customer');
 const genre = require('./controllers/genre')
-const home = require('./controllers/home');
 const movie = require('./controllers/movie')
 const rental = require('./controllers/rental');
 const user = require('./controllers/user');
 const auth = require('./controllers/auth');
-const { authUser } = require('./middlewares/middlewares');
+const { authUser, isAdmin, apllyTryCatch } = require('./middlewares/middlewares');
 
-router.get("/", home.index);
+router.get("/api/customers", authUser, apllyTryCatch(customer.index));
+router.get("/api/customers/:id", authUser, apllyTryCatch(customer.showOne));
+router.post("/api/customers", authUser, apllyTryCatch(customer.register));
+router.put("/api/customers/:id", authUser, apllyTryCatch(customer.edit));
+router.delete("/api/customers/:id", authUser, isAdmin, apllyTryCatch(customer.delete));
 
-router.get("/api/customers", authUser, customer.index);
-router.get("/api/customers/:id", authUser, customer.showOne);
-router.post("/api/customers", authUser, customer.register);
-router.put("/api/customers/:id", authUser, customer.edit);
-router.delete("/api/customers/:id", authUser, customer.delete);
+router.get("/api/genres", apllyTryCatch(genre.index));
+router.get("/api/genres/:id", apllyTryCatch(genre.showOne));
+router.post("/api/genres", authUser, apllyTryCatch(genre.register));
+router.put("/api/genres/:id", authUser, apllyTryCatch(genre.edit));
+router.delete("/api/genres/:id", authUser, apllyTryCatch(genre.delete));
 
-router.get("/api/genres", genre.index);
-router.get("/api/genres/:id", genre.showOne);
-router.post("/api/genres", authUser, genre.register);
-router.put("/api/genres/:id", authUser, genre.edit);
-router.delete("/api/genres/:id", authUser, genre.delete);
-
-router.get("/api/movies", movie.index);
-router.get("/api/movies/:id", movie.showOne);
-router.post("/api/movies", authUser, movie.register);
-router.put("/api/movies/:id", authUser, movie.edit);
-router.delete("/api/movies/:id", authUser, movie.delete);
+router.get("/api/movies", apllyTryCatch(movie.index));
+router.get("/api/movies/:id", apllyTryCatch(movie.showOne));
+router.post("/api/movies", authUser, apllyTryCatch(movie.register));
+router.put("/api/movies/:id", authUser, apllyTryCatch(movie.edit));
+router.delete("/api/movies/:id", authUser, apllyTryCatch(movie.delete));
 
 
-router.get("/api/rentals", authUser, rental.index);
-router.get("/api/rentals/:id", rental.showOne);
-router.post("/api/rentals", authUser, rental.register);
-router.put("/api/rentals/:id", authUser, rental.edit);
-router.delete("/api/rentals/:id", authUser, rental.delete);
+router.get("/api/rentals", authUser, apllyTryCatch(rental.index));
+router.get("/api/rentals/:id", apllyTryCatch(rental.showOne));
+router.post("/api/rentals", authUser,apllyTryCatch( rental.register));
+router.put("/api/rentals/:id", authUser, apllyTryCatch(rental.edit));
+router.delete("/api/rentals/:id", authUser, apllyTryCatch(rental.delete));
 
-router.get("/api/users", user.index);
-router.post("/api/users", user.register);
 
-router.post("/api/auth", auth.login);
+router.get("/api/users", apllyTryCatch(user.index));
+router.get("/api/users/me", authUser, apllyTryCatch(user.currentUser));
+router.post("/api/users", apllyTryCatch(user.register));
+
+router.post("/api/auth", apllyTryCatch(auth.login));
 
 module.exports = router;

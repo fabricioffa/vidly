@@ -7,15 +7,11 @@ const {
 } = require("../verifiers");
 
 exports.index = async (req, res) => {
-  try {
-    const rentals = await Rental.find().populate('customer movie', 'name title -_id').select("-__v");
+  const rentals = await Rental.find().populate('customer movie', 'name title -_id').select("-__v");
 
-    if (!rentals.length) return res.send("We're currently out of rentals");
+  if (!rentals.length) return res.send("We're currently out of rentals");
 
-    res.send(rentals);
-  } catch (err) {
-    console.log(err);
-  }
+  res.send(rentals);
 };
 
 exports.register = async (req, res) => {
@@ -28,83 +24,74 @@ exports.register = async (req, res) => {
     }
     return res.status(400).send(errors);
   }
-  try {
-    if (!await Customer.exists({ _id: req.body.customerId })) return res.status(400).send("Id doesn't match any customer.");
 
-    const movie = await Movie.findById(req.body.movieId);
-    if (!movie) return res.status(400).send("Id doesn't match any movie.");
+  if (!await Customer.exists({ _id: req.body.customerId })) return res.status(400).send("Id doesn't match any customer.");
 
-    const rental = await Rental.create({
-      customer: req.body.customerId,
-      movie: req.body.movieId,
-      paymentForm: req.body.paymentForm,
-    });
+  const movie = await Movie.findById(req.body.movieId);
+  if (!movie) return res.status(400).send("Id doesn't match any movie.");
 
-    movie.numberInStock--;
-    movie.save();
+  const rental = await Rental.create({
+    customer: req.body.customerId,
+    movie: req.body.movieId,
+    paymentForm: req.body.paymentForm,
+  });
 
-    res.send(rental);
-  } catch (err) {
-    console.log(err);
-  }
+  movie.numberInStock--;
+  movie.save();
+
+  res.send(rental);
 };
 
 exports.edit = async (req, res) => {
-  try {
-    const rental = await Rental.findById(req.params.id);
-    if (!rental) return res.status(404).send("Rental not found.");
+  const rental = await Rental.findById(req.params.id);
+  if (!rental) return res.status(404).send("Rental not found.");
 
-    const { error } = putVerifier(req.body);
-    if (error) {
-      let errors = "Atention!\n";
-      for (const detail of error.details) {
-        errors = `${errors + detail.message}\n`;
-      }
-      return res.status(400).send(errors);
+  const { error } = putVerifier(req.body);
+  if (error) {
+    let errors = "Atention!\n";
+    for (const detail of error.details) {
+      errors = `${errors + detail.message}\n`;
     }
-
-    if (!await Customer.exists({ _id: req.body.customerId || rental.customer })) return res.status(400).send("Id doesn't match any customer.");
-
-    if (!await Movie.exists({ _id: req.body.movieId || rental.movie })) return res.status(400).send("Id doesn't match any movie.");
-
-    const updatedRental = await Rental.findOneAndUpdate(
-      { _id: req.params.id },
-      {
-        customer: req.body.customerId ? req.body.customerId : rental.customer,
-        movie: req.body.movieId ? req.body.movieId : rental.movie,
-        paymentForm: req.body.paymentForm
-          ? req.body.paymentForm
-          : rental.paymentForm,
-      },
-      { returnDocument: "after" },
-    ).populate('customer movie', 'name title -_id').select("-__v");
-
-    res.send(updatedRental);
-  } catch (err) {
-    console.log(err);
+    return res.status(400).send(errors);
   }
+
+  if (!await Customer.exists({ _id: req.body.customerId || rental.customer })) return res.status(400).send("Id doesn't match any customer.");
+
+  if (!await Movie.exists({ _id: req.body.movieId || rental.movie })) return res.status(400).send("Id doesn't match any movie.");
+
+  const updatedRental = await Rental.findOneAndUpdate(
+    { _id: req.params.id },
+    {
+      customer: req.body.customerId ? req.body.customerId : rental.customer,
+      movie: req.body.movieId ? req.body.movieId : rental.movie,
+      paymentForm: req.body.paymentForm
+        ? req.body.paymentForm
+        : rental.paymentForm,
+    },
+    { returnDocument: "after" },
+  ).populate('customer movie', 'name title -_id').select("-__v");
+
+  res.send(updatedRental);
 };
 
 exports.delete = async (req, res) => {
-  try {
-    const rental = await Rental.findByIdAndRemove(req.params.id).populate('customer movie', 'name title -_id').select("-__v");
+  const rental = await Rental
+    .findByIdAndRemove(req.params.id)
+    .populate('customer movie', 'name title -_id')
+    .select("-__v");
 
-    if (!rental) return res.status(404).send("Rental not found");
+  if (!rental) return res.status(404).send("Rental not found");
 
-    res.send(rental);
-  } catch (err) {
-    console.log(err);
-  }
+  res.send(rental);
 };
 
 exports.showOne = async (req, res) => {
-  try {
-    const rental = await Rental.findById(req.params.id).populate('customer movie', 'name title -_id').select("-__v");
+  const rental = await Rental
+    .findById(req.params.id)
+    .populate('customer movie', 'name title -_id')
+    .select("-__v");
 
-    if (!rental) return res.status(404).send("Rental not found");
+  if (!rental) return res.status(404).send("Rental not found");
 
-    res.send(rental);
-  } catch (err) {
-    console.log(err);
-  }
+  res.send(rental);
 };

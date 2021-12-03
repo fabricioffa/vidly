@@ -6,15 +6,11 @@ const {
 } = require("../verifiers");
 
 exports.index = async (req, res) => {
-  try {
     const users = await User.find().select("-__v");
 
     if (!users.length) return res.send("We're currently out of users");
 
     res.send(users);
-  } catch (err) {
-    console.log(err);
-  }
 };
 
 exports.register = async (req, res) => {
@@ -30,21 +26,21 @@ exports.register = async (req, res) => {
 
   if (await User.exists({ email: req.body.email })) return res.status(404).send('User already exists.');
 
-  try {
-    let { name, email, password } = req.body;
+    let { name, email, password, isAdmin = false } = req.body;
 
     const salt = await bcryptjs.genSalt(10);
     password = await bcryptjs.hash(password, salt);
 
-    const user = await User.create({ name, email, password });
+    const user = await User.create({ name, email, password, isAdmin });
     const { _id } = user;
 
     const token = user.generateAuthToken();
     if (!token) return res.status(500).send('Could not generate token.');
 
-    res.header('x-auth-token', token).send({ _id, name, email });
-  } catch (err) {
-    console.log(err);
-  }
+    res.header('x-auth-token', token).send({ _id, name, email, isAdmin });
 };
 
+exports.currentUser = async (req, res) => {
+  const user = await User.findById(req.user._id).select('-password -__v');
+  res.send(user);
+}

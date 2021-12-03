@@ -97,6 +97,7 @@ exports.userPostVerifier = (body) => {
     name: Joi.string().min(3).max(40).lowercase().trim().required(),
     email: Joi.string().min(8).max(50).email().required(),
     password: Joi.string().min(8).max(255).required(),
+    isAdmin: Joi.boolean(),
   });
 
   return schema.validate(body, { abortEarly: false });

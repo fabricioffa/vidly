@@ -6,15 +6,11 @@ const {
 } = require("../verifiers");
 
 exports.index = async (req, res) => {
-  try {
     const movies = await Movie.find().select("-__v");
 
     if (!movies.length) return res.send("We're currently out of movies");
 
     res.send(movies);
-  } catch (err) {
-    console.log(err);
-  }
 };
 
 exports.register = async (req, res) => {
@@ -28,7 +24,6 @@ exports.register = async (req, res) => {
     return res.status(400).send(errors);
   }
 
-  try {
     const genre = await Genre.findById(req.body.genreId);
     if (!genre) return res.status(400).send("Id doesn't match any genre.");
 
@@ -45,13 +40,9 @@ exports.register = async (req, res) => {
     });
 
     res.send(movie);
-  } catch (err) {
-    console.log(err);
-  }
 };
 
 exports.edit = async (req, res) => {
-  try {
     const movie = await Movie.findById(req.params.id);
     if (!movie) return res.status(404).send("Movie not found.");
 
@@ -92,31 +83,20 @@ exports.edit = async (req, res) => {
     ).select("-__v");
 
     res.send(updatedMovie);
-  } catch (err) {
-    console.log( err);
-  }
 };
 
 exports.delete = async (req, res) => {
-  try {
     const movie = await Movie.findByIdAndRemove(req.params.id).select("-__v");
 
     if (!movie) return res.status(404).send("Movie not found");
 
-    res.send(movie);
-  } catch (err) {
-    console.log(err);
-  }
+    res.send(movie)
 };
 
 exports.showOne = async (req, res) => {
-  try {
     const movie = await Movie.findById(req.params.id).select("-__v");
 
     if (!movie) return res.status(404).send("Movie not found");
 
     res.send(movie);
-  } catch (err) {
-    console.log(err);
-  }
 };
