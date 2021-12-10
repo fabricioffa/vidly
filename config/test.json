@@ -2,5 +2,5 @@
   "name" : "Vidly",
   "default port": 3333,
   "jwtPrivateKey": "vidly_jwtPrivateKey",
-  "db": "mongodb://localhost:27017/vidly"
+  "db": "mongodb://localhost:27017/vidly_tests"
 }

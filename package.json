@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --watchAll --verbose",
     "start": "nodemon server.js"
   },
   "keywords": [],
@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "jest": "^27.4.3",
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.15",
+    "supertest": "^6.1.6"
   }
 }

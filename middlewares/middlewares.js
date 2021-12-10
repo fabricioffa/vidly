@@ -1,10 +1,11 @@
 const jwt = require('jsonwebtoken');
 const config = require('config');
-const winston = require('winston');
+// const winston = require('winston');
+const mongoose = require('mongoose');
 
 exports.authUser = (req, res, next) => {
-  const token = req.header('x-auth-token')
-  if (!token) return res.status(401).send('Access denied: no token provided');
+const token = req.header('x-auth-token')
+if (!token) return res.status(401).send('Access denied: no token provided');
 
   try {
     const decoded = jwt.verify(token, config.get('jwtPrivateKey'));
@@ -22,7 +23,7 @@ exports.isAdmin = (req, res, next) => {
 };
 
 exports.errorHandler = (err, req, res, next) => {
-  winston.error(err.message, err);
+  console.error(err.message, err);
   if (err) return res.status(500).send('Something occurred!');
 };
 
@@ -35,4 +36,9 @@ exports.apllyTryCatch = (handler) => {
     }
   };
 };
+
+exports.isValidObjectId = (req, res, next) => {
+  if (!mongoose.isValidObjectId(req.params.id)) return res.status(404).send('Invalid ID.');
+  next();
+}
 

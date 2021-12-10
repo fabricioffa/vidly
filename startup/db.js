@@ -1,6 +1,9 @@
 const mongoose = require("mongoose");
+const config = require("config");
 
 module.exports = (app) => {
-  mongoose.connect('mongodb://localhost:27017/vidly')
-  .then(() => app.emit('connected'))
+  mongoose
+    .connect(config.get("db"))
+    .then(() => app.emit("connected"))
+    .catch((err) => console.error("Connection error:\n", err));
 };

@@ -19,7 +19,6 @@ exports.register = async (req, res) => {
     for (const detail of error.details) {
       errors = `${errors + detail.message}\n`;
     }
-    console.log("Entrei aqui no erro do JOI");
     return res.status(400).send(errors);
   }
 

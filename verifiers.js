@@ -76,7 +76,6 @@ exports.rentalPostVerifier = (body) => {
   const schema = Joi.object({
     customerId: Joi.objectId().required(),
     movieId: Joi.objectId().required(),
-    paymentForm: Joi.string().min(5).max(255).required(),
   });
 
   return schema.validate(body, { abortEarly: false });
@@ -86,7 +85,9 @@ exports.rentalPutVerifier = (body) => {
   const schema = Joi.object({
     customerId: Joi.objectId(),
     movieId: Joi.objectId(),
-    paymentForm: Joi.string().min(5).max(255).valid('creditcard', 'money', 'crypto'),
+    dateOut: Joi.date(),
+    devolutionDate: Joi.date(),
+    rentalFee: Joi.number(),
   });
 
   return schema.validate(body, { abortEarly: false });
