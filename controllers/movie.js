@@ -1,9 +1,5 @@
 const Movie = require("../models/Movie");
 const { Genre } = require("../models/Genre");
-const {
-  moviePostVerifier: postVerifier,
-  moviePutVerifier: putVerifier,
-} = require("../verifiers");
 
 exports.index = async (req, res) => {
   const movies = await Movie.find().select("-__v");
@@ -14,16 +10,6 @@ exports.index = async (req, res) => {
 };
 
 exports.register = async (req, res) => {
-  const { error } = postVerifier(req.body);
-
-  if (error) {
-    let errors = "Atention!\n";
-    for (const detail of error.details) {
-      errors = `${errors + detail.message}\n`;
-    }
-    return res.status(400).send(errors);
-  }
-
   const genre = await Genre.findByIdAndUpdate(req.body.genreId, {
     $inc: { movies: 1 },
   }).session(session);
@@ -47,15 +33,6 @@ exports.register = async (req, res) => {
 exports.edit = async (req, res) => {
   const movie = await Movie.findById(req.params.id);
   if (!movie) return res.status(404).send("Movie not found.");
-
-  const { error } = putVerifier(req.body);
-  if (error) {
-    let errors = "Atention!\n";
-    for (const detail of error.details) {
-      errors = `${errors + detail.message}\n`;
-    }
-    return res.status(400).send(errors);
-  }
 
   if (req.body.genreId) {
     if (!(await Genre.exists({ _id: req.body.genreId })))

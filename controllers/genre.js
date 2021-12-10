@@ -1,8 +1,4 @@
 const { Genre } = require("../models/Genre");
-const {
-  genrePostVerifier: postVerifier,
-  genrePutVerifier: putVerifier,
-} = require("../verifiers");
 
 exports.index = async (req, res) => {
   const genres = await Genre.find().select("-__v");
@@ -12,16 +8,6 @@ exports.index = async (req, res) => {
 };
 
 exports.register = async (req, res) => {
-  const { error } = postVerifier(req.body);
-
-  if (error) {
-    let errors = "Atention!\n";
-    for (const detail of error.details) {
-      errors = `${errors + detail.message}\n`;
-    }
-    return res.status(400).send(errors);
-  }
-
   const genre = await Genre.create({
     name: req.body.name,
     movies: req.body.movies,
@@ -34,21 +20,11 @@ exports.edit = async (req, res) => {
   const genre = await Genre.findById(req.params.id);
   if (!genre) return res.status(404).send("Genre not found");
 
-  const { error } = putVerifier(req.body);
-  if (error) {
-    let errors = "Atention!\n";
-    for (const detail of error.details) {
-      errors = `${errors + detail.message}\n`;
-    }
-    return res.status(400).send(errors);
-  }
-
   const genreUpdated = await Genre.findOneAndUpdate(
     { _id: req.params.id },
     {
       name: req.body.name ? req.body.name : genre.name,
-      movies:
-        req.body.movies !== undefined ? req.body.movies : "genre".movies,
+      movies: req.body.movies !== undefined ? req.body.movies : "genre".movies,
       isSafe: req.body.isSafe ? req.body.isSafe : genre.isSafe,
     },
     { returnDocument: "after" }

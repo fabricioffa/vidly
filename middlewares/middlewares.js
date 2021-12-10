@@ -42,3 +42,19 @@ exports.isValidObjectId = (req, res, next) => {
   next();
 }
 
+exports.validate = (validator) => {
+  return (req, res, next) => {
+    const { error } = validator(req.body);
+
+    if (error) {
+      let errors = "Atention!\n";
+      for (const detail of error.details) {
+        errors = `${errors + detail.message}\n`;
+      }
+      return res.status(400).send(errors);
+    }
+
+    next();
+  }
+}
+

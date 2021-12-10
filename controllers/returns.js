@@ -1,21 +1,8 @@
 const Rental = require("../models/Rental");
 const Customer = require("../models/Customer");
 const Movie = require("../models/Movie");
-const {
-  rentalPostVerifier: postVerifier,
-  rentalPutVerifier: putVerifier,
-} = require("../verifiers");
 
 module.exports = async (req, res) => {
-  const { error } = postVerifier(req.body);
-  if (error) {
-    let errors = "Atention!\n";
-    for (const detail of error.details) {
-      errors = `${errors + detail.message}\n`;
-    }
-    return res.status(400).send(errors);
-  }
-
   const rental = await Rental.findOne({
     customer: req.body.customerId,
     movie: req.body.movieId,

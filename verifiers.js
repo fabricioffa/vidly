@@ -104,15 +104,15 @@ exports.userPostVerifier = (body) => {
   return schema.validate(body, { abortEarly: false });
 };
 
-exports.userPutVerifier = (body) => {
-  const schema = Joi.object({
-    name: Joi.string().min(3).max(40).lowercase().trim(),
-    email: Joi.string().min(8).max(255).email(),
-    password: Joi.string().min(8).max(255),
-  });
+// exports.userPutVerifier = (body) => {
+//   const schema = Joi.object({
+//     name: Joi.string().min(3).max(40).lowercase().trim(),
+//     email: Joi.string().min(8).max(255).email(),
+//     password: Joi.string().min(8).max(255),
+//   });
 
-  return schema.validate(body, { abortEarly: false });
-};
+//   return schema.validate(body, { abortEarly: false });
+// };
 
 exports.userLoginVerifier = (body) => {
   const schema = Joi.object({
