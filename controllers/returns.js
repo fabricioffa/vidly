@@ -12,20 +12,7 @@ module.exports = async (req, res) => {
   if (rental.devolutionDate)
     return res.status(400).send("Rental already returned");
 
-  const {
-    movie: { dailyRentalRate },
-  } = await Rental.findOne({ movie: req.body.movieId })
-    .populate({
-      path: "movie",
-      select: "dailyRentalRate -_id",
-    })
-    .select("movie -_id");
-
-  rental.devolutionDate = Date.now();
-  const rentingDays = Math.floor(
-    (rental.devolutionDate - rental.dateOut) / (1000 * 60 * 60 * 24)
-  );
-  rental.rentalFee = rentingDays * dailyRentalRate;
+  rental.calcRentalFee(req.body.movieId);
 
   await Movie.findByIdAndUpdate(req.body.movieId, {
     $inc: { numberInStock: 1 },
@@ -33,5 +20,5 @@ module.exports = async (req, res) => {
 
   await rental.save();
 
-  res.status(200).send(rental);
+  res.send(rental);
 };

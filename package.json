@@ -5,7 +5,10 @@
   "main": "server.js",
   "scripts": {
     "test": "jest --watchAll --verbose",
-    "start": "nodemon server.js"
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": "14.17.6"
   },
   "keywords": [],
   "author": "",

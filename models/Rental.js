@@ -25,6 +25,24 @@ const rentalSchema = new mongoose.Schema({
   },
 });
 
+rentalSchema.methods.calcRentalFee = async function (movieId) {
+  const {
+    movie: { dailyRentalRate },
+  } = await Rental.findOne({ movie: movieId })
+    .populate({
+      path: "movie",
+      select: "dailyRentalRate -_id",
+    })
+    .select("movie -_id");
+
+  this.devolutionDate = Date.now();
+  
+  const rentingDays = Math.floor(
+    (this.devolutionDate - this.dateOut) / (1000 * 60 * 60 * 24)
+  );
+  this.rentalFee = rentingDays * dailyRentalRate;
+};
+
 // rentalSchema.pre('save', async function() {
 //   const isGold = await Customer.exists({ _id: this.customer, isGold: true });
 
